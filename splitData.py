@@ -10,15 +10,15 @@ divides the reviews into three files:
     verifiedPurchase.test
     verifiedPurchase.train
 
-    split is 60/20/20, train/devel/test
+    split is 80/10/10, train/devel/test
 
 each product file has the format (tab after label):
-pictures (1 or 0), rating (out of 5), verified or unverified (u or v), then review text
+pictures (1 or 0), rating (out of 5), verified or unverified (u or v), TAB, review title, TAB, review text
 
 URL
-1 3 v	review text goes here
-0 5 u	I really loved this product!!!
-1 4 v	this is a terrible product
+1 3 v	title   1 review text goes here
+0 5 u	title2  I really loved this product!!!
+1 4 v	EX  is a terrible product
 
 '''
 
@@ -31,22 +31,20 @@ def splitData():
     test = open("dataSplits/verifiedPurchase.test", 'w')
 
     for file in os.listdir(productDirectory):
-        if file.endswith("_product_reviews.txt"):
 
-            # iterate through lines
-            with open(productDirectory + file) as f:
-                next(f)
-                for line in f:
-                    assert "\t" in line
+        # iterate through lines
+        with open(productDirectory + file) as f:
+            next(f) # skip first line
+            for line in f:
 
-                    # randomly write to train, devel, or test
-                    i = random.randint(0, 99)
-                    if i < 60:
-                        train.write(line)
-                    elif i < 80:
-                        devel.write(line)
-                    elif i < 100:
-                        test.write(line)
+                # randomly write to train, devel, or test
+                i = random.randint(0, 99)
+                if i < 80:
+                    train.write(line)
+                elif i < 90:
+                    devel.write(line)
+                elif i < 100:
+                    test.write(line)
 
     train.close()
     devel.close()

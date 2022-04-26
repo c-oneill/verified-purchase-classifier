@@ -31,23 +31,17 @@ NDArray = Union[np.ndarray, spmatrix]
 def read_smsspam(smsspam_path: str) -> Iterator[Tuple[Text, Text]]:
     """Generates (label, text) tuples from the lines in an SMSSpam file.
 
-    SMSSpam files contain one message per line. Each line is composed of a label
-    (ham or spam), a tab character, and the text of the SMS. Here are some
-    examples:
-
-        1 3 v	review text goes here
-        0 5 u	I really loved this product!!!
-        1 4 v	this is a terrible product
+    FROMAT: https://s3.amazonaws.com/amazon-reviews-pds/tsv/index.txt
 
     :param smsspam_path: The path of an SMSSpam file, formatted as above.
     :return: An iterator over (label, text) tuples.
     """
     lst = list()
     for line in open(smsspam_path):
-        line_split = line.split("\t", 1)
+        line_split = line.split("\t")
 
-        text = line_split[1]
-        pic, rating, label = line_split[0].split()
+        text = line_split[13]
+        label = line_split[11]
 
         lst.append((label, text))
     return iter(lst)
@@ -199,7 +193,7 @@ def main():
 
     # measure performance of predictions
     devel_indices = to_labels(devel_labels)
-    spam_label = to_labels.index("u")
+    spam_label = to_labels.index("N")  # as in "no, not a verified purchase"
     f1 = f1_score(devel_indices, predicted_indices, pos_label=spam_label)
     accuracy = accuracy_score(devel_indices, predicted_indices)
 
