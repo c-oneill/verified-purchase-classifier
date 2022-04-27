@@ -36,14 +36,25 @@ def read_smsspam(smsspam_path: str) -> Iterator[Tuple[Text, Text]]:
     :param smsspam_path: The path of an SMSSpam file, formatted as above.
     :return: An iterator over (label, text) tuples.
     """
+    unverifiedCount = 0;
+    verifiedCount = 0
+
     lst = list()
     for line in open(smsspam_path):
         line_split = line.split("\t")
 
         text = line_split[13]
         label = line_split[11]
+        if label == "N":
+            unverifiedCount += 1
+        if label == "Y":
+            verifiedCount += 1
 
         lst.append((label, text))
+
+    print("unverified count:", unverifiedCount)
+    print("verifiedCount count:", verifiedCount)
+
     return iter(lst)
 
 
@@ -63,9 +74,9 @@ class TextToFeatures:
         :param texts: The training texts.
         """
         self.__vectorizer = CountVectorizer(ngram_range=(1, 2),
-                                            #min_df=4,
-                                            token_pattern=
+                                            token_pattern= #r"(?u)\b\w\w +\b")
                                             r"(?u)\b[a-zA-Z]+\b|\d|!|\?|\"|\'|\.|\(|\)|\-|;|/|&|\$|\+|£")
+
         self.__vectorizer.fit(texts)
         # Notes:
         # default token pattern: r”(?u)\b\w\w+\b”
